@@ -29,6 +29,7 @@ RSpec.describe "Merchants API" do
     expect(this_merchant["data"]["id"].to_i).to eq(merchant_1.id)
   end
 
+# relationships
   it "sends a list of items for a given merchant relationship" do 
     merchant_1 = Merchant.create!(name: "Johns Superstore")
     merchant_2 = Merchant.create!(name: "Sallys Superstore")
@@ -46,7 +47,28 @@ RSpec.describe "Merchants API" do
     expect(items["data"].first["attributes"]["unit_price"]).to eq(100)
 
     expect(items["data"].count).to eq(2)
+  end
 
+  it "returns a list of invoices for a merchant" do 
+    merchant_1 = Merchant.create!(name: "Johns Superstore")
+    merchant_2 = Merchant.create!(name: "Sallys Superstore")
+    merchant_3 = Merchant.create!(name: "Joes Superstore")
+    customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+    invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+    invoice_2 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+    invoice_3 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+    get "/api/v1/merchants/#{merchant_1.id}/invoices"
+
+    expect(response).to be_successful
+
+    merchant_invoices = JSON.parse(response.body)
+
+    expect(merchant_invoices["data"].count).to eq(3)
+    expect(merchant_invoices["data"][0]["id"]).to eq((merchant_1.invoices[0].id).to_s) 
+    expect(merchant_invoices["data"][1]["id"]).to eq((merchant_1.invoices[1].id).to_s)
+    expect(merchant_invoices["data"][2]["id"]).to eq((merchant_1.invoices[2].id).to_s)
   end
 
   it "returns a list of the top user defined merchants by total revenue(most_revenue=x)" do 
@@ -77,6 +99,7 @@ RSpec.describe "Merchants API" do
     expect(response).to be_successful
   end
 
+#*** Find
   it "it can find merchant by params (:id)" do 
     merchant_1 = Merchant.create!(name: "Johns Superstore")
     merchant_2 = Merchant.create!(name: "Sallys Superstore")
@@ -123,6 +146,8 @@ RSpec.describe "Merchants API" do
     expect(merchant_response["data"]["attributes"]["name"]).to eq(merchant_1.name)
   end
 #**********
+#find_all
+#*****
   it "it can **find_all** merchants by params (:id)" do 
     merchant_1 = Merchant.create!(name: "Johns Superstore")
     merchant_2 = Merchant.create!(name: "Sallys Superstore")
