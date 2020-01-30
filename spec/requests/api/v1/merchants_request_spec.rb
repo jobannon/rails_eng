@@ -131,7 +131,7 @@ RSpec.describe "Merchants API" do
     get "/api/v1/merchants/find_all?id=#{merchant_1.id}"
      
     merchant_response = JSON.parse(response.body)
-    expect(merchant_response["data"]["attributes"]["name"]).to eq("Johns Superstore")
+    expect(merchant_response["data"].first["attributes"]["name"]).to eq("Johns Superstore")
     expect(merchant_response["data"].count).to eq(1)
   end
 
