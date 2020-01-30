@@ -178,4 +178,16 @@ RSpec.describe "Merchants API" do
     expect(merchant_response["data"][2]["attributes"]["name"]).to eq(merchant_3.name)
     expect(merchant_response["data"].count).to eq(3)
   end
+
+  it "can find a random resource" do
+    merchant_1 = Merchant.create!(name: "Johns Superstore")
+    merchant_2 = Merchant.create!(name: "Sallys Superstore")
+    merchant_3 = Merchant.create!(name: "Joes Superstore")
+    merchant_4 = Merchant.create!(name: "Supers Superstore")
+
+    get "/api/v1/merchants/random?updated_at=#{merchant_1.updated_at}"
+    merchant_response = JSON.parse(response.body)
+
+    expect(Merchant.find_rand.class).to eq(Merchant)
+  end
 end
