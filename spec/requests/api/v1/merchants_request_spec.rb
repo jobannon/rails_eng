@@ -29,190 +29,191 @@ RSpec.describe "Merchants API" do
     expect(this_merchant["data"]["id"].to_i).to eq(merchant_1.id)
   end
 
-# relationships
-  it "sends a list of items for a given merchant relationship" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
-    item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
-    item_3 = merchant_2.items.create!(name: "shampoo", description: "yep, its shampoo", unit_price: 1)
+  describe "Merchants API relationships" do 
+    it "sends a list of items for a given merchant relationship" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
+      item_3 = merchant_2.items.create!(name: "shampoo", description: "yep, its shampoo", unit_price: 1)
 
-    get "/api/v1/merchants/#{merchant_1.id}/items"
+      get "/api/v1/merchants/#{merchant_1.id}/items"
 
-    items = JSON.parse(response.body)
+      items = JSON.parse(response.body)
 
-    expect(response).to be_successful
-    expect(items["data"].first["attributes"]["name"]).to eq("toothbrush")
-    expect(items["data"].first["attributes"]["description"]).to eq("yep, its a toothbrush")
-    expect(items["data"].first["attributes"]["unit_price"]).to eq(100)
+      expect(response).to be_successful
+      expect(items["data"].first["attributes"]["name"]).to eq("toothbrush")
+      expect(items["data"].first["attributes"]["description"]).to eq("yep, its a toothbrush")
+      expect(items["data"].first["attributes"]["unit_price"]).to eq(100)
 
-    expect(items["data"].count).to eq(2)
+      expect(items["data"].count).to eq(2)
+    end
+
+    it "returns a list of invoices for a merchant" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      invoice_2 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      invoice_3 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/merchants/#{merchant_1.id}/invoices"
+
+      expect(response).to be_successful
+
+      merchant_invoices = JSON.parse(response.body)
+
+      expect(merchant_invoices["data"].count).to eq(3)
+      expect(merchant_invoices["data"][0]["id"]).to eq((merchant_1.invoices[0].id).to_s) 
+      expect(merchant_invoices["data"][1]["id"]).to eq((merchant_1.invoices[1].id).to_s)
+      expect(merchant_invoices["data"][2]["id"]).to eq((merchant_1.invoices[2].id).to_s)
+    end
   end
 
-  it "returns a list of invoices for a merchant" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
-    customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+  describe "Merchants API Business Intelligence methods" do
+    it "returns a list of the top user defined merchants by total revenue(most_revenue=x)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
 
-    invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
-    invoice_2 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
-    invoice_3 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      customer_1 = Customer.create!(first_name: "josh", last_name: "tim")
+      invoice_1 = Invoice.create!(customer_id: customer_1.id, merchant_id: merchant_1.id, status: "processed")  
+      invoice_item_1 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_1.id, quantity: 2, unit_price: 10) 
 
-    get "/api/v1/merchants/#{merchant_1.id}/invoices"
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      customer_1 = Customer.create!(first_name: "josh", last_name: "tim")
+      invoice_1 = Invoice.create!(customer_id: customer_1.id, merchant_id: merchant_1.id, status: "processed")  
+      invoice_item_1 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_1.id, quantity: 2, unit_price: 10) 
 
-    expect(response).to be_successful
+      item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
+      customer_1 = Customer.create!(first_name: "josh", last_name: "tim")
+      invoice_2 = Invoice.create!(customer_id: customer_1.id, merchant_id: merchant_1.id, status: "processed")  
+      invoice_item_1 = InvoiceItem.create!(invoice_id: invoice_2.id, item_id: item_2.id, quantity: 2, unit_price: 10) 
+      
 
-    merchant_invoices = JSON.parse(response.body)
+      get '/api/v1/merchants/most_revenue?quantity=1'
 
-    expect(merchant_invoices["data"].count).to eq(3)
-    expect(merchant_invoices["data"][0]["id"]).to eq((merchant_1.invoices[0].id).to_s) 
-    expect(merchant_invoices["data"][1]["id"]).to eq((merchant_1.invoices[1].id).to_s)
-    expect(merchant_invoices["data"][2]["id"]).to eq((merchant_1.invoices[2].id).to_s)
-  end
+      top_two = JSON.parse(response.body)
 
-  it "returns a list of the top user defined merchants by total revenue(most_revenue=x)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
+      expect(response).to be_successful
+    end
 
-    item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
-    customer_1 = Customer.create!(first_name: "josh", last_name: "tim")
-    invoice_1 = Invoice.create!(customer_id: customer_1.id, merchant_id: merchant_1.id, status: "processed")  
-    invoice_item_1 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_1.id, quantity: 2, unit_price: 10) 
+  describe "Merchants API Finder methods"
+    it "it can find merchant by params (:id)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
 
-    item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
-    customer_1 = Customer.create!(first_name: "josh", last_name: "tim")
-    invoice_1 = Invoice.create!(customer_id: customer_1.id, merchant_id: merchant_1.id, status: "processed")  
-    invoice_item_1 = InvoiceItem.create!(invoice_id: invoice_1.id, item_id: item_1.id, quantity: 2, unit_price: 10) 
+      get "/api/v1/merchants/find?id=#{merchant_1.id}"
+       
+      merchant_response = JSON.parse(response.body)
+      expect(merchant_response["data"]["attributes"]["name"]).to eq("Johns Superstore")
+    end
 
-    item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
-    customer_1 = Customer.create!(first_name: "josh", last_name: "tim")
-    invoice_2 = Invoice.create!(customer_id: customer_1.id, merchant_id: merchant_1.id, status: "processed")  
-    invoice_item_1 = InvoiceItem.create!(invoice_id: invoice_2.id, item_id: item_2.id, quantity: 2, unit_price: 10) 
-    
+    it "it can find merchant by params (:name)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
 
-    get '/api/v1/merchants/most_revenue?quantity=1'
+      get "/api/v1/merchants/find?name=#{merchant_1.name}"
 
-    top_two = JSON.parse(response.body)
+      merchant_response = JSON.parse(response.body)
+      expect(merchant_response["data"]["attributes"]["name"]).to eq("Johns Superstore")
+    end
 
-    expect(response).to be_successful
-  end
+    it "it can find merchant by params (:create_at)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore", created_at: "Thu, 30 Jan 2020 01:50:39" )
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
 
-#*** Find
-  it "it can find merchant by params (:id)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
+      get "/api/v1/merchants/find?created_at=#{merchant_1.created_at}"
+      merchant_response = JSON.parse(response.body)
 
-    get "/api/v1/merchants/find?id=#{merchant_1.id}"
-     
-    merchant_response = JSON.parse(response.body)
-    expect(merchant_response["data"]["attributes"]["name"]).to eq("Johns Superstore")
-  end
+      expect(merchant_response["data"]["id"]).to eq(merchant_1.id.to_s)
+      expect(merchant_response["data"]["attributes"]["name"]).to eq(merchant_1.name)
+    end
 
-  it "it can find merchant by params (:name)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
+    it "it can find merchant by params (:updated_at)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39" )
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
 
-    get "/api/v1/merchants/find?name=#{merchant_1.name}"
+      get "/api/v1/merchants/find?updated_at=#{merchant_1.updated_at}"
+      merchant_response = JSON.parse(response.body)
 
-    merchant_response = JSON.parse(response.body)
-    expect(merchant_response["data"]["attributes"]["name"]).to eq("Johns Superstore")
-  end
+      expect(merchant_response["data"]["id"]).to eq(merchant_1.id.to_s)
+      expect(merchant_response["data"]["attributes"]["name"]).to eq(merchant_1.name)
+    end
 
-  it "it can find merchant by params (:create_at)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore", created_at: "Thu, 30 Jan 2020 01:50:39" )
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
+    it "it can **find_all** merchants by params (:id)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
 
-    get "/api/v1/merchants/find?created_at=#{merchant_1.created_at}"
-    merchant_response = JSON.parse(response.body)
+      get "/api/v1/merchants/find_all?id=#{merchant_1.id}"
+       
+      merchant_response = JSON.parse(response.body)
+      expect(merchant_response["data"].first["attributes"]["name"]).to eq("Johns Superstore")
+      expect(merchant_response["data"].count).to eq(1)
+    end
 
-    expect(merchant_response["data"]["id"]).to eq(merchant_1.id.to_s)
-    expect(merchant_response["data"]["attributes"]["name"]).to eq(merchant_1.name)
-  end
+    it "it can **find_all** merchants by params (:name)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Johns Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
 
-  it "it can find merchant by params (:updated_at)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39" )
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
+      get "/api/v1/merchants/find_all?name=#{merchant_1.name}"
 
-    get "/api/v1/merchants/find?updated_at=#{merchant_1.updated_at}"
-    merchant_response = JSON.parse(response.body)
+      merchant_response = JSON.parse(response.body)
 
-    expect(merchant_response["data"]["id"]).to eq(merchant_1.id.to_s)
-    expect(merchant_response["data"]["attributes"]["name"]).to eq(merchant_1.name)
-  end
-#**********
-#find_all
-#*****
-  it "it can **find_all** merchants by params (:id)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
+      expect(merchant_response["data"].first["attributes"]["name"]).to eq("Johns Superstore")
+      expect(merchant_response["data"].last["attributes"]["name"]).to eq("Johns Superstore")
+      expect(merchant_response["data"].count).to eq(2)
+    end
 
-    get "/api/v1/merchants/find_all?id=#{merchant_1.id}"
-     
-    merchant_response = JSON.parse(response.body)
-    expect(merchant_response["data"].first["attributes"]["name"]).to eq("Johns Superstore")
-    expect(merchant_response["data"].count).to eq(1)
-  end
+    it "it can **find_all** merchants by params (:create_at)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore", created_at: "Thu, 30 Jan 2020 01:50:39" )
+      merchant_2 = Merchant.create!(name: "Sallys Superstore", created_at: "Thu, 30 Jan 2020 01:50:39")
+      merchant_3 = Merchant.create!(name: "Joes Superstore", created_at: "Thu, 30 Jan 2020 01:50:39")
+      merchant_4 = Merchant.create!(name: "Supers Superstore")
 
-  it "it can **find_all** merchants by params (:name)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Johns Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
+      get "/api/v1/merchants/find_all?created_at=#{merchant_1.created_at}"
+      merchant_response = JSON.parse(response.body)
 
-    get "/api/v1/merchants/find_all?name=#{merchant_1.name}"
+      expect(merchant_response["data"].first["attributes"]["name"]).to eq(merchant_1.name)
+      expect(merchant_response["data"][1]["attributes"]["name"]).to eq(merchant_2.name)
+      expect(merchant_response["data"][2]["attributes"]["name"]).to eq(merchant_3.name)
+      expect(merchant_response["data"].count).to eq(3)
+    end
 
-    merchant_response = JSON.parse(response.body)
+    it "it can **find_all** merchants by params (:updated_at)" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39" )
+      merchant_2 = Merchant.create!(name: "Sallys Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39")
+      merchant_3 = Merchant.create!(name: "Joes Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39")
+      merchant_4 = Merchant.create!(name: "Supers Superstore")
 
-    expect(merchant_response["data"].first["attributes"]["name"]).to eq("Johns Superstore")
-    expect(merchant_response["data"].last["attributes"]["name"]).to eq("Johns Superstore")
-    expect(merchant_response["data"].count).to eq(2)
-  end
+      get "/api/v1/merchants/find_all?updated_at=#{merchant_1.updated_at}"
+      merchant_response = JSON.parse(response.body)
 
-  it "it can **find_all** merchants by params (:create_at)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore", created_at: "Thu, 30 Jan 2020 01:50:39" )
-    merchant_2 = Merchant.create!(name: "Sallys Superstore", created_at: "Thu, 30 Jan 2020 01:50:39")
-    merchant_3 = Merchant.create!(name: "Joes Superstore", created_at: "Thu, 30 Jan 2020 01:50:39")
-    merchant_4 = Merchant.create!(name: "Supers Superstore")
+      expect(merchant_response["data"].first["attributes"]["name"]).to eq(merchant_1.name)
+      expect(merchant_response["data"][1]["attributes"]["name"]).to eq(merchant_2.name)
+      expect(merchant_response["data"][2]["attributes"]["name"]).to eq(merchant_3.name)
+      expect(merchant_response["data"].count).to eq(3)
+    end
 
-    get "/api/v1/merchants/find_all?created_at=#{merchant_1.created_at}"
-    merchant_response = JSON.parse(response.body)
+    it "can find a random resource" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      merchant_2 = Merchant.create!(name: "Sallys Superstore")
+      merchant_3 = Merchant.create!(name: "Joes Superstore")
+      merchant_4 = Merchant.create!(name: "Supers Superstore")
 
-    expect(merchant_response["data"].first["attributes"]["name"]).to eq(merchant_1.name)
-    expect(merchant_response["data"][1]["attributes"]["name"]).to eq(merchant_2.name)
-    expect(merchant_response["data"][2]["attributes"]["name"]).to eq(merchant_3.name)
-    expect(merchant_response["data"].count).to eq(3)
-  end
+      get "/api/v1/merchants/random?updated_at=#{merchant_1.updated_at}"
+      merchant_response = JSON.parse(response.body)
 
-  it "it can **find_all** merchants by params (:updated_at)" do 
-    merchant_1 = Merchant.create!(name: "Johns Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39" )
-    merchant_2 = Merchant.create!(name: "Sallys Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39")
-    merchant_3 = Merchant.create!(name: "Joes Superstore", updated_at: "Thu, 30 Jan 2020 01:50:39")
-    merchant_4 = Merchant.create!(name: "Supers Superstore")
-
-    get "/api/v1/merchants/find_all?updated_at=#{merchant_1.updated_at}"
-    merchant_response = JSON.parse(response.body)
-
-    expect(merchant_response["data"].first["attributes"]["name"]).to eq(merchant_1.name)
-    expect(merchant_response["data"][1]["attributes"]["name"]).to eq(merchant_2.name)
-    expect(merchant_response["data"][2]["attributes"]["name"]).to eq(merchant_3.name)
-    expect(merchant_response["data"].count).to eq(3)
-  end
-
-  it "can find a random resource" do
-    merchant_1 = Merchant.create!(name: "Johns Superstore")
-    merchant_2 = Merchant.create!(name: "Sallys Superstore")
-    merchant_3 = Merchant.create!(name: "Joes Superstore")
-    merchant_4 = Merchant.create!(name: "Supers Superstore")
-
-    get "/api/v1/merchants/random?updated_at=#{merchant_1.updated_at}"
-    merchant_response = JSON.parse(response.body)
-
-    expect(Merchant.find_rand.class).to eq(Merchant)
+      expect(Merchant.find_rand.class).to eq(Merchant)
+    end
   end
 end
