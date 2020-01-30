@@ -27,18 +27,47 @@ RSpec.describe "Invoices API" do
     end
 
     it "sends a list of invoice_items" do 
-      get "/api/v1/invoices/:id/invoice_items"
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
+      item_3 = merchant_1.items.create!(name: "shampoo", description: "yep, its shampoo", unit_price: 1)
 
-#     "item_id"
-#     "invoice_id"
-#      "quantity"
-#      "unit_price"
-#      "created_at", null: false
-#      "updated_at", null: false
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
 
+      invoice_item_1 = InvoiceItem.create!(item_id: item_1.id ,invoice_id: invoice_1.id, quantity: 1, unit_price: 100)
+      invoice_item_2 = InvoiceItem.create!(item_id: item_2.id ,invoice_id: invoice_1.id, quantity: 1, unit_price: 100)
 
+      get "/api/v1/invoices/#{invoice_1.id}/invoice_items"
 
+      invoice_items_response = JSON.parse(response.body)
 
+      expect(invoice_items_response["data"].count).to eq(2)
+      expect(invoice_items_response["data"][0]["attributes"]["item_id"]).to eq(invoice_item_1.item_id)
+      expect(invoice_items_response["data"].first["attributes"]["invoice_id"]).to eq(invoice_item_1.invoice_id)
+      expect(invoice_items_response["data"].first["attributes"]["quantity"]).to eq(invoice_item_1.quantity)
+      expect(invoice_items_response["data"].first["attributes"]["unit_price"]).to eq(invoice_item_1.unit_price)
+    end
+
+    it "sends a list of assoicated items for a given invoice" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
+      item_3 = merchant_1.items.create!(name: "shampoo", description: "yep, its shampoo", unit_price: 1)
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      invoice_item_1 = InvoiceItem.create!(item_id: item_1.id ,invoice_id: invoice_1.id, quantity: 1, unit_price: 100)
+      invoice_item_2 = InvoiceItem.create!(item_id: item_2.id ,invoice_id: invoice_1.id, quantity: 1, unit_price: 100)
+      invoice_item_2 = InvoiceItem.create!(item_id: item_3.id ,invoice_id: invoice_1.id, quantity: 1, unit_price: 100)
+
+      get "/api/v1/invoices/#{invoice_1.id}/items"
+      
+      items_for_invoice_response = JSON.parse(response.body)
+      expect(items_for_invoice_response["data"].count).to eq(3)
+      expect(items_for_invoice_response["data"].first["attributes"]["name"]).to eq(item_1.name)
+      expect(items_for_invoice_response["data"].first["attributes"]["description"]).to eq(item_1.description)
+      expect(items_for_invoice_response["data"].first["attributes"]["unit_price"]).to eq(item_1.unit_price)
     end
   end
 end
