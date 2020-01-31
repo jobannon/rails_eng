@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   namespace :api do
     namespace :v1 do
       namespace :merchants do  
@@ -9,9 +10,13 @@ Rails.application.routes.draw do
         get '/:id/items', to: "merchantitems#index"
       end
       namespace :invoices do 
+        get 'find', to: "find#show"
+        get '/find_all', to: "find#index"
+
         get '/:id/invoice_items', to: "invoiceitems#index"
         get '/:id/items', to: "invoiceitems#show"
-
+        get '/:id/customer', to: "invoicecustomer#show" #is this right? 
+        get '/:id/merchant', to: "invoicemerchant#show"
       end
 
       resources :invoices, only: [:index, :show] do 
@@ -27,6 +32,4 @@ Rails.application.routes.draw do
 
     end
   end
-
-  # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end
