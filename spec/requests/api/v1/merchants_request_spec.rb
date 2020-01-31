@@ -72,6 +72,7 @@ RSpec.describe "Merchants API" do
     end
   end
 
+ 
   describe "Merchants API Business Intelligence methods" do
     it "returns a list of the top user defined merchants by total revenue(most_revenue=x)" do 
       merchant_1 = Merchant.create!(name: "Johns Superstore")
@@ -124,7 +125,7 @@ RSpec.describe "Merchants API" do
       expect(merchant_response["data"]["attributes"]["name"]).to eq("Johns Superstore")
     end
 
-    it "it can find merchant by params (:create_at)" do 
+    it "it can find merchant by params (:created_at)" do 
       merchant_1 = Merchant.create!(name: "Johns Superstore", created_at: "Thu, 30 Jan 2020 01:50:39" )
       merchant_2 = Merchant.create!(name: "Sallys Superstore")
       merchant_3 = Merchant.create!(name: "Joes Superstore")
