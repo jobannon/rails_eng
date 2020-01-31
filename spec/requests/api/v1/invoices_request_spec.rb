@@ -69,5 +69,255 @@ RSpec.describe "Invoices API" do
       expect(items_for_invoice_response["data"].first["attributes"]["description"]).to eq(item_1.description)
       expect(items_for_invoice_response["data"].first["attributes"]["unit_price"]).to eq(item_1.unit_price)
     end
+
+    it "sends a record of the customer for an invoice" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
+      item_3 = merchant_1.items.create!(name: "shampoo", description: "yep, its shampoo", unit_price: 1)
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/#{invoice_1.id}/customer"
+
+      invoice_customer_response = JSON.parse(response.body)
+
+      expect(invoice_customer_response["data"].class).to eq(Hash)
+      expect(invoice_customer_response["data"].class).to_not eq(Array)
+      expect(invoice_customer_response["data"]["attributes"]["first_name"]).to eq(customer_1.first_name.to_s)
+      expect(invoice_customer_response["data"]["attributes"]["last_name"]).to eq(customer_1.last_name.to_s)
+    end
+
+    it "send a record of the assoicated merchant for the invoice" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
+      item_3 = merchant_1.items.create!(name: "shampoo", description: "yep, its shampoo", unit_price: 1)
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/#{invoice_1.id}/merchant"
+
+      invoice_merchant_response = JSON.parse(response.body)
+
+      expect(invoice_merchant_response["data"].class).to eq(Hash)
+      expect(invoice_merchant_response["data"].class).to_not eq(Array)
+      expect(invoice_merchant_response["data"]["attributes"]["name"]).to eq(merchant_1.name.to_s)
+    end
+  end
+
+  describe "resource endpoints" do 
+    it "get get record of a single invoice" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      item_1 = merchant_1.items.create(name: "toothbrush", description: "yep, its a toothbrush", unit_price: 100)
+      item_2 = merchant_1.items.create(name: "soap", description: "yep, its soap", unit_price: 10)
+      item_3 = merchant_1.items.create!(name: "shampoo", description: "yep, its shampoo", unit_price: 1)
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/#{invoice_1.id}"
+       
+      show_invoice = JSON.parse(response.body)
+
+      expect(show_invoice["data"].class).to eq(Hash)
+      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_invoice["data"]["id"]).to eq(invoice_1.id.to_s)
+      
+      expect(show_invoice["data"]["attributes"]["merchant_id"]).to eq(invoice_1.merchant_id)
+      expect(show_invoice["data"]["attributes"]["customer_id"]).to eq(invoice_1.customer_id)
+    end
+
+  end
+
+  describe "Invoices API find by methods" do 
+    it "can send a single record after finding by id" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find?id=#{invoice_1.id}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Hash)
+      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_invoice["data"]["id"]).to eq(invoice_1.id.to_s)
+      
+      expect(show_invoice["data"]["attributes"]["merchant_id"]).to eq(invoice_1.merchant_id)
+      expect(show_invoice["data"]["attributes"]["customer_id"]).to eq(invoice_1.customer_id)
+    end
+
+    it "can send a single record after finding by merchant_id" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find?merchant_id=#{invoice_1.merchant_id}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Hash)
+      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_invoice["data"]["attributes"]["merchant_id"]).to eq(invoice_1.merchant_id)
+      expect(show_invoice["data"]["attributes"]["customer_id"]).to eq(invoice_1.customer_id)
+    end
+
+    it "can send a single record after finding by customer_id" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find?customer_id=#{invoice_1.customer_id}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Hash)
+      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_invoice["data"]["attributes"]["merchant_id"]).to eq(invoice_1.merchant_id)
+      expect(show_invoice["data"]["attributes"]["customer_id"]).to eq(invoice_1.customer_id)
+    end
+    
+    it "can send a single record after finding by status (this will be better done on the find_all below)" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find?status=#{invoice_1.status}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Hash)
+      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_invoice["data"]["attributes"]["merchant_id"]).to eq(invoice_1.merchant_id)
+      expect(show_invoice["data"]["attributes"]["customer_id"]).to eq(invoice_1.customer_id)
+      expect(show_invoice["data"]["attributes"]["status"]).to eq(invoice_1.status)
+    end
+#########################################
+    it "can send a single record after finding by created_at(this will be better done on the find_all below)" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find?created_at=#{invoice_1.created_at}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Hash)
+      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_invoice["data"]["attributes"]["merchant_id"]).to eq(invoice_1.merchant_id)
+      expect(show_invoice["data"]["attributes"]["customer_id"]).to eq(invoice_1.customer_id)
+      expect(show_invoice["data"]["attributes"]["created_at"]).to eq(invoice_1.created_at)
+    end
+
+    it "can send a single record after finding by updated_at(this will be better done on the find_all below)" do
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find?updated_at=#{invoice_1.updated_at}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Hash)
+      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_invoice["data"]["attributes"]["merchant_id"]).to eq(invoice_1.merchant_id)
+      expect(show_invoice["data"]["attributes"]["customer_id"]).to eq(invoice_1.customer_id)
+      expect(show_invoice["data"]["attributes"]["updated_at"]).to eq(invoice_1.updated_at)
+    end
+
+    it "can send multiple records after doing a find_all on Invoice merchant_id" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      invoice_2 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      invoice_3 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find_all?merchant_id=#{merchant_1.id}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Array)
+      expect(show_invoice["data"].class).to_not eq(Hash)
+
+      expect(show_invoice["data"][0]["attributes"]["merchant_id"]).to eq(merchant_1.id)
+      expect(show_invoice["data"][1]["attributes"]["merchant_id"]).to eq(merchant_1.id)
+      expect(show_invoice["data"][2]["attributes"]["merchant_id"]).to eq(merchant_1.id)
+      expect(show_invoice["data"].count).to eq(3)
+
+    end  
+
+    it "can send multiple records after doing a find_all on Invoice customer_id" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      invoice_2 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+      invoice_3 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed")
+
+      get "/api/v1/invoices/find_all?customer_id=#{customer_1.id}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Array)
+      expect(show_invoice["data"].class).to_not eq(Hash)
+
+      expect(show_invoice["data"][0]["attributes"]["customer_id"]).to eq(customer_1.id)
+      expect(show_invoice["data"][1]["attributes"]["customer_id"]).to eq(customer_1.id)
+      expect(show_invoice["data"][2]["attributes"]["customer_id"]).to eq(customer_1.id)
+      expect(show_invoice["data"].count).to eq(3)
+    end  
+
+    it "can send multiple records after doing a find_all on Invoice created_at" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed", created_at: "Thu, 30 Jan 2020 01:50:39")
+      invoice_2 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed", created_at: "Thu, 30 Jan 2020 01:50:39") 
+      invoice_3 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed", created_at: "Thu, 30 Jan 2020 01:50:39")
+
+      get "/api/v1/invoices/find_all?created_at=#{invoice_1.created_at}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Array)
+      expect(show_invoice["data"].class).to_not eq(Hash)
+
+      expect(show_invoice["data"][0]["attributes"]["created_at"]).to eq(invoice_1.created_at)
+      expect(show_invoice["data"][1]["attributes"]["created_at"]).to eq(invoice_2.created_at)
+      expect(show_invoice["data"][2]["attributes"]["created_at"]).to eq(invoice_3.created_at)
+      expect(show_invoice["data"].count).to eq(3)
+    end  
+
+    it "can send multiple records after doing a find_all on Invoice created_at" do 
+      merchant_1 = Merchant.create!(name: "Johns Superstore")
+      customer_1 = Customer.create!(first_name: "josh", last_name: "student")
+
+      invoice_1 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed", created_at: "Thu, 30 Jan 2020 01:50:39")
+      invoice_2 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed", created_at: "Thu, 30 Jan 2020 01:50:39") 
+      invoice_3 = Invoice.create!(merchant_id: merchant_1.id, customer_id: customer_1.id, status: "processed", created_at: "Thu, 30 Jan 2020 01:50:39")
+
+      get "/api/v1/invoices/find_all?status=#{invoice_1.status}"
+
+      show_invoice = JSON.parse(response.body) 
+
+      expect(show_invoice["data"].class).to eq(Array)
+      expect(show_invoice["data"].class).to_not eq(Hash)
+
+      expect(show_invoice["data"][0]["attributes"]["status"]).to eq(invoice_1.status)
+      expect(show_invoice["data"][1]["attributes"]["status"]).to eq(invoice_2.status)
+      expect(show_invoice["data"][2]["attributes"]["status"]).to eq(invoice_3.status)
+      expect(show_invoice["data"].count).to eq(3)
+    end  
   end
 end
