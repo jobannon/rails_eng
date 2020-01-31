@@ -1,7 +1,6 @@
 class Api::V1::Invoices::FindController < ApplicationController
 
   def show
-    binding.pry
     render json: InvoiceSerializer.new(Invoice.find_by(request.query_parameters)) 
   end
 
