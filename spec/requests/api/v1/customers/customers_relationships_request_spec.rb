@@ -51,15 +51,15 @@ RSpec.describe "InvoicesItems API" do
       transaction_2 = Transaction.create!(invoice_id: invoice_1.id, credit_card_number: "5555.5555.5555", result: "successful")
       transaction_3 = Transaction.create!(invoice_id: invoice_1.id, credit_card_number: "6666.6666.6666", result: "successful")
 
-      get "/api/v1/customers/#{customer_1.id}/invoices"
+      get "/api/v1/customers/#{customer_1.id}/transactions"
 
-      show_invoices = JSON.parse(response.body) 
+      show_transactions = JSON.parse(response.body) 
 
-      expect(show_invoices["data"].class).to eq(Array)
-      expect(show_invoices["data"].class).to_not eq(Hash)
+      expect(show_transactions["data"].class).to eq(Array)
+      expect(show_transactions["data"].class).to_not eq(Hash)
 
-      expect(show_invoices["data"][0]["id"]).to eq(customer_1.invoices[0].id.to_s)
-      expect(show_invoices["data"].count).to eq(3)
+      expect(show_transactions["data"][0]["id"]).to eq(customer_1.transactions[0].id.to_s)
+      expect(show_transactions["data"].count).to eq(3)
     end
   end
 end
