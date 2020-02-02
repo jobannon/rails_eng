@@ -14,4 +14,9 @@ class Merchant < ApplicationRecord
     end
     Merchant.find(array_for_sampling.sample)
   end
+
+  def self.find_with_order(id)
+    items = Merchant.find(id).items
+    items.order(:id)
+  end
 end 
