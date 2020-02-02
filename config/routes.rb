@@ -2,40 +2,39 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      
       namespace :merchants do  
         get '/find', to: "find#show"
         get '/find_all', to: "find#index"
-        get '/random', to: "findrand#show"
-
-        get '/:id/items', to: "merchantitems#index"
       end
-
       namespace :invoices do 
         get '/find', to: "find#show"
         get '/find_all', to: "find#index"
-
-        get '/:id/invoice_items', to: "invoiceitems#index"
-        get '/:id/items', to: "invoiceitems#show"
-        get '/:id/customer', to: "invoicecustomer#show" #is this right? 
-        get '/:id/merchant', to: "invoicemerchant#show"
       end
-      
+      namespace :customers do 
+        get '/find', to: "find#show"
+        get '/find_all', to: "find#index"
+      end
       namespace :invoice_items do 
         get '/find', to: "find#show"
         get '/find_all', to: "find#index"
-        get '/:id/invoice', to: "show_invoice#show"
-        get '/:id/item', to: "show_item#show"
       end
+
       resources :merchants, only: [:index, :show] do 
-        resources :items, only: [:index]
-        resources :invoices, only: [:index]
+        get '/invoices', to: "merchants/merchantinvoices#index"
+        get '/items', to: "merchants/merchantitems#index"
       end
       resources :invoices, only: [:index, :show] do 
-        resources :transactions, only: [:index]
-        resources :invoice_items, only: [:index]
+        get '/invoice_items', to: "invoices/invoiceitems#index"
+        get '/items',         to: "invoices/invoiceitems#show"
+        get '/customer',      to: "invoices/invoicecustomer#show" #is this right? 
+        get '/merchant',      to: "invoices/invoicemerchant#show"
+        get '/transactions',  to: "invoices/invoicetransactions#show"
       end
       resources :invoice_items, only: [:index, :show] do
+        get '/invoice', to: "invoice_items/show_invoice#show"
+        get '/item', to: "invoice_items/show_item#show"
+      end
+      resources :customers, only: [:index, :show] do
       end
 
       get "/merchants/most_revenue", to: "merchants#most_revenue"  
