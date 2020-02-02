@@ -1,4 +1,3 @@
-
 require "rails_helper"
 
 RSpec.describe "InvoicesItems API" do 
@@ -43,12 +42,12 @@ RSpec.describe "InvoicesItems API" do
 
       get "/api/v1/invoice_items/#{invoiceitem_1.id}/item"
 
-      show_invoice = JSON.parse(response.body) 
+      show_item= JSON.parse(response.body) 
 
-      expect(show_invoice["data"].class).to eq(Hash)
-      expect(show_invoice["data"].class).to_not eq(Array)
+      expect(show_item["data"].class).to eq(Hash)
+      expect(show_item["data"].class).to_not eq(Array)
 
-      expect(show_invoice["data"]["id"]).to eq(invoiceitem_1.item_id.to_s)
+      expect(show_item["data"]["id"]).to eq(invoiceitem_1.item_id.to_s)
     end
   end
 end
