@@ -5,4 +5,9 @@ class Invoice < ApplicationRecord
 
   belongs_to :customer
   belongs_to :merchant
+
+  def self.find_with_order(id)
+    items = Invoice.find_by(id).invoices
+    items.order(:id)
+  end
 end

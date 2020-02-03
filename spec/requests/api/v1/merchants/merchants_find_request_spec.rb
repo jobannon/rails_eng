@@ -53,7 +53,7 @@ RSpec.describe "Merchants API Finder methods" do
     merchant_3 = Merchant.create!(name: "Joes Superstore")
     merchant_4 = Merchant.create!(name: "Supers Superstore")
 
-    get "/api/v1/merchants/random?updated_at=#{merchant_1.updated_at}"
+    get "/api/v1/merchants/random"
     merchant_response = JSON.parse(response.body)
 
     expect(Merchant.find_rand.class).to eq(Merchant)
