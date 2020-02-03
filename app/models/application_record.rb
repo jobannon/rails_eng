@@ -5,12 +5,7 @@ class ApplicationRecord < ActiveRecord::Base
     where(query_hash)
   end
 
-  # def self.find_rand(Model)
-  #   # total_merchants = Merchant.all.count - 1
-  #   array_for_sampling = Array.new
-  #   Model.all.each do |model|
-  #     array_for_sampling << model.id
-  #   end
-  #   Model.find(array_for_sampling.sample)
-  # end
+  def self.find_rand
+    self.order('RANDOM()').first
+  end
 end
