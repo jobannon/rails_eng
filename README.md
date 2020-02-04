@@ -123,7 +123,6 @@ To get a local copy up and running follow these simple steps.
 ## Usage
 
 This API is divided into 6 resource tables.  All resources are exposed.
-
 |------| 
 |customers|
 |transactions|
@@ -306,9 +305,9 @@ Distributed under License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@jtobannon](https://twitter.com/jtobannon) - jtobannon@gmail.com 
+[@jtobannon](https://twitter.com/jtobannon) - jtobannon@gmail.com 
 
-Project Link: [https://github.com/jobannon/rails_eng](https://github.com/jobannon/rails_eng)
+[https://github.com/jobannon/rails_eng](https://github.com/jobannon/rails_eng)
 
 
 
