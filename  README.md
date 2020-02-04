@@ -92,6 +92,7 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
+This is an example of how to list things you need to use the software and how to install them.
 * FastAPI
 
 ### Installation
@@ -113,9 +114,9 @@ To get a local copy up and running follow these simple steps.
     ```
 
 4. Test Suite Usage 
-  ```sh
-  bundle exec rspec 
-  ```
+    ```sh
+    bundle exec rspec 
+    ```
 
 
 
@@ -123,13 +124,13 @@ To get a local copy up and running follow these simple steps.
 ## Usage
 
 This API is divided into 6 resource tables.  All resources are exposed.
-
-customers
-transactions
-invoices
-merchants
-items
-invoiceitems
+|------| 
+|customers|
+|transactions|
+|invoices|
+|merchants|
+|items|
+|invoiceitems|
 
 ### Endpoints
 
@@ -329,7 +330,7 @@ Project Link: [https://github.com/jobannon/rails_eng](https://github.com/jobanno
 [stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=flat-square
 [stars-url]: https://github.com/othneildrew/Best-README-Template/stargazers
 [issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=flat-square
-[issues-url]: https://github.com/jobannon/rails_eng/issues
+[issues-url]: https://github.com/othneildrew/Best-README-Template/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=flat-square
 [license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
