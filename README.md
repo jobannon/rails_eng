@@ -22,11 +22,7 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
@@ -34,23 +30,23 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/jobannon/rails_eng">
-    <img src="images/schema.png" alt="Logo" width="80" height="80">
-  </a>
+<a href="https://github.com/jobannon/rails_eng">
+  <img src="images/schema.png" alt="Logo" width="80" height="80">
+</a>
 
-  <h3 align="center">Rails Engine API</h3>
+<h3 align="center">Rails Engine API</h3>
 
-  <p align="center">
-    A Business Intelligence Focused API.  Built from scratch. 
-    <br />
-    <a href="https://github.com/jobannon/rails_eng"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    ·
-    <a href="https://github.com/jobannon/rails_eng/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/jobannon/rails_eng/issues">Request Feature</a>
-  </p>
+<p align="center">
+  A Business Intelligence Focused API.  Built from scratch. 
+  <br />
+  <a href="https://github.com/jobannon/rails_eng"><strong>Explore the docs »</strong></a>
+  <br />
+  <br />
+  ·
+  <a href="https://github.com/jobannon/rails_eng/issues">Report Bug</a>
+  ·
+  <a href="https://github.com/jobannon/rails_eng/issues">Request Feature</a>
+</p>
 </p>
 
 
@@ -59,15 +55,16 @@
 ## Table of Contents
 
 * [About the Project](#about-the-project)
-  * [Built With](#built-with)
+* [Built With](#built-with)
 * [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
+* [Prerequisites](#prerequisites)
+* [Installation](#installation)
 * [Usage](#usage)
-  * [Endpoints](#Endpoints)
+* [Endpoints](#Endpoints)
   * [Relationships](#Relationships)
   * [Single_Finder](#Single_Finder)
   * [Multi_Finder](#Multi_Finder)
+  * [Random](#Random)
   * [Query](#Query)
 * [Roadmap](#roadmap)
 * [License](#license)
@@ -79,17 +76,12 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`github_username`, `repo`, `twitter_handle`, `email`
-
+Customer Built Business Class API using using Rails and Ruby 
 
 ### Built With
 
-* [](Ruby 2.5.1)
-* [](Rails 5.1.7)
+* (Ruby 2.5.1)
+* (Rails 5.1.7)
 
 
 
@@ -104,22 +96,27 @@ This is an example of how to list things you need to use the software and how to
 * FastAPI
 
 ### Installation
- 
+
 1. Clone the repo
-```sh
-git clone https://github.com/jobannon/rails_eng.git
-```
+    ```sh
+    git clone https://github.com/jobannon/rails_eng.git
+    ```
 2. Setup the Database  
-```sh
-bundle exec rails db:drop
-bundle exec rails db:create
-bundle exec rails db:migrate
-bundle exec rails db:seed
-```
-3. Test Suite Usage 
-```sh
-bundle exec rspec 
-```
+    ```sh
+    bundle exec rails db:drop
+    bundle exec rails db:create
+    bundle exec rails db:migrate
+    bundle exec rails db:seed
+    ```
+3. Populate our API with data using a custom built rake file
+    ```sh
+    rake import:all_import 
+    ```
+
+4. Test Suite Usage 
+  ```sh
+  bundle exec rspec 
+  ```
 
 
 
@@ -138,15 +135,20 @@ invoiceitems
 ### Endpoints
 
 All resource endponts are exposed for an "index" and "show" action
-Index>
-  * Example
-    ``` sh 
-    GET /api/v1/merchants
-    ``` 
-  * Usage
-    GET /api/v1/<resource>
-  * Output
-    ```sh
+
+<strong>Index</strong>
+* Example
+
+  ```sh 
+  GET /api/v1/merchants
+  ``` 
+
+* Usage
+  ```sh
+      GET /api/v1/<resource>
+  ```
+* Output
+  ```sh
     {
     "data": [
     {
@@ -173,14 +175,46 @@ Index>
     ]
   }
   ```
-Show>
-  * Example
-    ``` sh 
-    GET /api/v1/merchants/:id
-    ```
-  * Usage
-    GET /api/v1/resource
-  * Output
+<strong>Show</strong>
+* Example
+  ```sh 
+  GET /api/v1/merchants/:id
+  ```
+* Usage
+
+  ```sh
+      GET /api/v1/resource
+  ```
+
+* Output
+  ```sh
+    {
+      "data": {
+        "id": "1",
+        "type": "merchant",
+        "attributes": {
+          "name": "Store Name"
+        }
+      }
+    }
+  ```
+
+
+### Single_Finder
+* Usage 
+  ``` sh
+    GET /api/v1/merchants/find?parameters
+  ``` 
+
+    | Param| search | resource attribute |
+    | ------------- |:-------------:| -----:|
+    | id| based on | id |
+    | name | based on |   name |
+    | created_at | based on | table.timestamp|
+    | updated_at| based on  |    table.timestamp |
+
+* All queries will return the first record
+* Output
     ```sh
       {
         "data": {
@@ -191,38 +225,88 @@ Show>
           }
         }
       }
-  ```
-
-
-### Single_Finder
+    ```
 ### Multi_Finder
+
+* Very similar to a single finder but will return the complete collection matching the search criteria
+      ``` sh
+      GET /api/v1/merchants/find_all?parameters
+      ```
+
+### Random
+* Returns a random resource within a collection
+    ```sh
+    api/v1/merchants/random
+    ```
+* This was built with `RANDOM` method in SQL 
+
 ### Relationships
+
+* Following relationships were built into each resource table and are reflected in the schema
+
+    | GET request | Returns | 
+    | --------------------------| -------:| 
+    ||  | 
+    |<strong>>Merchants</strong> |  | 
+    | GET /api/v1/merchants/:id/items | returns a collection of items associated with that merchant |  
+    | GET /api/v1/merchants/:id/items | returns a collection of items associated with that merchant |
+    | GET /api/v1/merchants/:id/invoices | returns a collection of invoices associated with that merchant from their known orders |  
+    | <strong>>Invoices</strong> |  | 
+    |  GET /api/v1/invoices/:id/transactions | returns a collection of associated transactions |  
+    |  GET /api/v1/invoices/:id/invoice_items |  returns a collection of associated invoice items |  
+    | GET /api/v1/invoices/:id/items | returns a collection of associated items |   
+    | GET /api/v1/invoices/:id/customer |   returns the associated customer |  
+    | GET /api/v1/invoices/:id/merchant  |  returns the associated merchant|  
+    | <strong>>Invoice Items</strong>  |  |  
+    | GET /api/v1/invoice_items/:id/invoice |returns the associated invoice  |  
+    | GET /api/v1/invoice_items/:id/item |returns the associated item  |  
+    | <strong>>Items</strong> |  |  
+    | GET /api/v1/items/:id/invoice_items | returns a collection of associated invoice items  |  
+    | GET /api/v1/items/:id/merchant | returns the associated merchant |  
+    |  <strong>>Transactions</strong> |  |  
+    | GET /api/v1/transactions/:id/invoice | returns the associated invoice |   
+    | <strong>>Customers</strong> |  |  
+    | GET /api/v1/customers/:id/invoices | returns a collection of associated invoices |  
+    | GET /api/v1/customers/:id/transactions | returns a collection of associated transactions |  
+    |  |  |   
+      
+
 ### Query
-This 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+* Business Intelligence Queries 
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
+    | GET request | Returns | 
+    | ------------| -------:| 
+    |<strong> >All Merchants</strong> |  | 
+    |GET /api/v1/merchants/most_revenue?quantity=x |  returns the top x merchants ranked by total revenue |  
+    |GET /api/v1/merchants/revenue?date=x | returns the total revenue for date x across all merchants |
+    | <strong>>Single Merchant</strong> | |
+    |GET /api/v1/merchants/:id/favorite_customer | returns the customer who has conducted the most total number of successful transactions |
+    | <strong>>Items</strong> | | 
+    | GET /api/v1/items/most_revenue?quantity=x | returns the top x items ranked by total revenue generated |
+    |GET /api/v1/items/:id/best_day | returns the date with the most sales for the given item using the invoice date. If there are multiple days, return the most recent day |
+    | <strong>>Customers</strong> | | 
+    |GET /api/v1/customers/:id/favorite_merchant | returns a merchant where the customer has conducted the most successful transactions |
 
 
 <!-- ROADMAP -->
 ## Roadmap
+* SEE ISSUES  
 
-See the [open issues](https://github.com/jobannon/rails_eng/issues) for a list of proposed features (and known issues).
+    See the [open issues](https://github.com/jobannon/rails_eng/issues) for a list of proposed features (and known issues).
 
 
 
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under License. See `LICENSE` for more information.
 
 
 
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@jtobannon](https://twitter.com/jtobannon) - email
+Your Name - [@jtobannon](https://twitter.com/jtobannon) - jtobannon@gmail.com 
 
 Project Link: [https://github.com/jobannon/rails_eng](https://github.com/jobannon/rails_eng)
 
@@ -231,9 +315,7 @@ Project Link: [https://github.com/jobannon/rails_eng](https://github.com/jobanno
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* []()
-* []()
-* []()
+* Turing School of Software and Design (www.turing.io)
 
 
 
@@ -252,5 +334,5 @@ Project Link: [https://github.com/jobannon/rails_eng](https://github.com/jobanno
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=flat-square
 [license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/othneildrew
+[linkedin-url]: https://linkedin.com/in/jtobannon
 [product-screenshot]: images/screenshot.png
