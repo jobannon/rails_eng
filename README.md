@@ -24,7 +24,7 @@
 -->
 [![Issues][issues-shield]][issues-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-
+[https://travis-ci.com/jobannon/rails_eng.svg?branch=master]
 
 
 <!-- PROJECT LOGO -->
