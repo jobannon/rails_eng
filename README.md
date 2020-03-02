@@ -27,11 +27,7 @@
 [![Build Status](https://travis-ci.com/jobannon/rails_eng.svg?branch=master)](https://travis-ci.com/jobannon/rails_eng)
 
 <!-- PROJECT LOGO -->
-<br />
-<p align="center">
-<a href="https://github.com/jobannon/rails_eng">
-  <img src="images/schema.png" alt="Logo" width="80" height="80">
-</a>
+![schema_rails_eng](https://user-images.githubusercontent.com/16090626/75723704-08c3f380-5c9a-11ea-8683-55080c917730.png)
 
 <h3 align="center">Rails Engine API</h3>
 
