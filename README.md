@@ -22,9 +22,9 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
-[![Issues][issues-shield]][issues-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 [![Build Status](https://travis-ci.com/jobannon/rails_eng.svg?branch=master)](https://travis-ci.com/jobannon/rails_eng)
+[![LinkedIn][linkedin-shield]][linkedin-url]
+
 
 <!-- PROJECT LOGO -->
 ![schema_rails_eng](https://user-images.githubusercontent.com/16090626/75723704-08c3f380-5c9a-11ea-8683-55080c917730.png)
@@ -317,8 +317,6 @@ Distributed under License. See `LICENSE` for more information.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=flat-square
-[issues-url]: https://github.com/jobannon/rails_eng
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=flat-square
 [license-url]: https://github.com/othneildrew/Best-README-Template/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/LinkedIn-Joshua%20O'Bannon%20(repo%20owner)-0e76a8
